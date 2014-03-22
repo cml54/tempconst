@@ -4,6 +4,9 @@ from make_temp_rel_const_table import *
 
 class TestConstraintNetwork(unittest.TestCase):
 
+    def setUp(self):
+        self.transitive_table = 'data/transitive_table.txt'
+
     def test_makePairs(self):
 
         nodes = set()
@@ -20,14 +23,13 @@ class TestConstraintNetwork(unittest.TestCase):
 
     def test_convToBitRep(self):
 
-        transConstraints = TransitiveConstraints()
+        transConstraints = TransitiveConstraints(self.transitive_table)
         self.assertEqual(transConstraints.convToBitRep('< o m d s'),
                          int('10001010101', 2))
 
     def test_storeBasicConstraints(self):
 
-        transConstraints = TransitiveConstraints()
-        transConstraints.storeBasicConstraints('transitive_table.txt')
+        transConstraints = TransitiveConstraints(self.transitive_table)
         totalConstraints = \
             sum(len(transConstraints.basicConstraints[v]) for
                 v in transConstraints.basicConstraints)

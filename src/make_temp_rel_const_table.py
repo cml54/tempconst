@@ -1,4 +1,5 @@
 import re
+import os
 import random
 from collections import defaultdict
 # from itertools import chain
@@ -23,13 +24,24 @@ class Node:
 
 class ConstraintNetwork:
 
-    def __init__(self, constraints=None):
+    def __init__(self, transitive_table=None, constraints=None):
+
+        cwd = os.path.dirname(os.path.realpath(__file__))
+        parentDir = os.path.dirname(cwd)
+
+        if transitive_table is None:
+            self.transitive_table = \
+                os.path.join(parentDir, 'data/transitive_table.txt')
+        else:
+            self.transitive_table = transitive_table
+
         self.logger = logging.getLogger('ConstraintNetwork')
         self.nodes = set()
         self.constraints = set()
         self.networkDict = defaultdict(dict)
         if constraints is None:
-            self.constraintCalculator = TransitiveConstraints()
+            self.constraintCalculator = \
+                TransitiveConstraints(self.transitive_table)
         else:
             self.constraintCalculator = constraints
 
@@ -333,7 +345,7 @@ class Link:
         self.source = source
         self.destination = destination
         self.relation = None
-        if relationSet is not None:
+        if relationSet is None:
             self.relation = TemporalRelation.ALL
         else:
             # TODO
@@ -357,19 +369,23 @@ class TransitiveConstraints:
     """
     """
 
-    def __init__(self):
+    def __init__(self, transitive_table):
 
         self.logger = logging.getLogger('TransitiveConstraints')
 
+        self.transitive_table = transitive_table
+
         self.logger.info('creating an instance of TransitiveConstraints')
         self.basicConstraints = defaultdict(dict)
-        self.storeBasicConstraints(
-            '/Users/clee001/Documents/2014/AnalysisOnTempRel' +
-            '/scripts/transitive_table.txt')
+        self.storeBasicConstraints()
 
-    def storeBasicConstraints(self, constraintFile):
+    def storeBasicConstraints(self, constraintFile=None):
 
         self.logger.info('Start to Store basic transitivity constraints')
+
+        if constraintFile is None:
+            constraintFile = self.transitive_table
+
         inobj = open(constraintFile, 'r')
 
         for line in inobj:
@@ -480,18 +496,3 @@ class TransitiveConstraints:
 
     #             self.looger.debug(' '.join(relSet1) + \
                                   # ',' + ' '.join(relSet2))
-
-
-def main():
-
-    basicTransitiveFile = ''
-
-    tempConst = TransitiveConstraints()
-
-    tempConst.storeBasicConstraints(basicTransitiveFile)
-
-    return
-
-if __name__ == '__main__':
-
-    main()
