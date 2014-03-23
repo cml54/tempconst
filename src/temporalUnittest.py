@@ -1,4 +1,5 @@
 import unittest
+import xmlrunner
 from make_temp_rel_const_table import *
 
 
@@ -124,4 +125,4 @@ class TestConstraintNetwork(unittest.TestCase):
 
 if __name__ == "__main__":
 
-    unittest.main()
+    unittest.main(testRunner=xmlrunner.XMLTestRunner(output='test-reports'))
